@@ -1,0 +1,6 @@
+training_exp_tracking/mlruns
+training_exp_tracking/preprocessor
+training_exp_tracking/models
+*.h5
+*.bin
+*.b
