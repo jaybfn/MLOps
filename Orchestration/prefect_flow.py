@@ -11,7 +11,7 @@ from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from hyperopt.pyll import scope
 
 import mlflow
-
+from prefect import flow
 
 def read_dataframe(filename):
 
@@ -130,7 +130,8 @@ def train_best_model(train, valid, y_val, dv):
 train_path = '../data/green_tripdata_2021-01.parquet'
 train_val = '../data/green_tripdata_2021-02.parquet'
 
-def mian(train_path, train_val):
+@flow
+def main(train_path, train_val):
 
     mlflow.set_tracking_uri("sqlite:///prediction.db")
     mlflow.set_experiment("nycity-taxi-experiment")
@@ -139,11 +140,11 @@ def mian(train_path, train_val):
 
     train = xgb.DMatrix(X_train, label = y_train)
     valid = xgb.DMatrix(X_val, label = y_val)
-    train_model_search(train, valid, y_val)
+    #train_model_search(train, valid, y_val)
     train_best_model(train, valid, y_val, dv)
 
 
-mian(train_path, train_val)
+main(train_path, train_val)
 
    
 
