@@ -59,7 +59,7 @@ def add_features(train_path, train_val):
 
 #################### Modeling ##################
 
-
+@task
 def train_model_search(train, valid, y_val):
     def objective(params):
 
@@ -95,7 +95,7 @@ def train_model_search(train, valid, y_val):
     return best_result
 
 
-
+@task
 def train_best_model(train, valid, y_val, dv):
 
     with mlflow.start_run():
@@ -140,7 +140,7 @@ def main(train_path, train_val):
 
     train = xgb.DMatrix(X_train, label = y_train)
     valid = xgb.DMatrix(X_val, label = y_val)
-    #train_model_search(train, valid, y_val)
+    train_model_search(train, valid, y_val)
     train_best_model(train, valid, y_val, dv)
 
 
