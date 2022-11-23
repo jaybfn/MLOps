@@ -12,7 +12,9 @@ from hyperopt.pyll import scope
 
 import mlflow
 from prefect import flow, task
+from prefect.task_runners import SequentialTaskRunner
 
+@task
 def read_dataframe(filename):
 
     df = pd.read_parquet(filename)
@@ -29,10 +31,10 @@ def read_dataframe(filename):
     return df
 
 @task
-def add_features(train_path, train_val):
+def add_features(df_train, df_val):
 
-    df_train = read_dataframe(train_path)
-    df_val = read_dataframe(train_val)
+    # df_train = read_dataframe(train_path)
+    # df_val = read_dataframe(train_val)
 
     df_train['PU_DU'] = df_train['PULocationID'] + '_' + df_train['DOLocationID']
     df_val['PU_DU'] = df_val['PULocationID'] + '_' + df_val['DOLocationID']
@@ -130,13 +132,15 @@ def train_best_model(train, valid, y_val, dv):
 train_path = '../data/green_tripdata_2021-01.parquet'
 train_val = '../data/green_tripdata_2021-02.parquet'
 
-@flow
+@flow(task_runner=SequentialTaskRunner())
 def main(train_path, train_val):
 
     mlflow.set_tracking_uri("sqlite:///prediction.db")
     mlflow.set_experiment("nycity-taxi-experiment")
+    X_train = read_dataframe(train_path)
+    X_val = read_dataframe(train_val)
 
-    X_train, y_train, X_val, y_val, dv = add_features(train_path, train_val).result()  # .result is when you use add_feature function as @task
+    X_train, y_train, X_val, y_val, dv = add_features(X_train, X_val).result()  # .result is when you use add_feature function as @task
 
     train = xgb.DMatrix(X_train, label = y_train)
     valid = xgb.DMatrix(X_val, label = y_val)
