@@ -85,15 +85,7 @@ def add_features(train_path, train_val):
 #     mlflow.log_metric('rmse',rmse)
 
 #     mlflow.log_artifact(local_path='model/lin_red.bin', artifact_path='models_pickle')
-params = {
-    'learning_rate': 0.20472,
-    'max_depth': 17,
-    'min_child_weight': 1.240261172,
-    'objective':'reg:linear',
-    'reg_alpha':0.285678967,
-    'reg_lambda': 0.004264404814,
-    'seed':42
-}
+
 
 
 def train_model_search(train, valid, y_val):
@@ -104,7 +96,7 @@ def train_model_search(train, valid, y_val):
             mlflow.log_params(params)
             booster = xgb.train(params = params,
                     dtrain = train,
-                    num_boost_round = 500,
+                    num_boost_round = 1000,
                     evals =[(valid,'validation')],
                     early_stopping_rounds = 1)
             y_pred = booster.predict(valid)
@@ -130,62 +122,50 @@ def train_model_search(train, valid, y_val):
     )
     return best_result
 
-X_train, y_train, X_val, y_val, dv = add_features(train_path, train_val)
-
-train = xgb.DMatrix(X_train, label = y_train)
-valid = xgb.DMatrix(X_val, label = y_val)
-train_model_search(train, valid, y_val)
 
 
+def train_best_model(train, valid, y_val, dv):
+
+    with mlflow.start_run():
+
+        train = xgb.DMatrix(X_train, label = y_train)
+        valid = xgb.DMatrix(X_val, label = y_val)
+        params = {
+        'learning_rate': 0.20472,
+        'max_depth': 17,
+        'min_child_weight': 1.240261172,
+        'objective':'reg:linear',
+        'reg_alpha':0.285678967,
+        'reg_lambda': 0.004264404814,
+        'seed':42
+        }
+        mlflow.log_params(params)
+        
+        booster = xgb.train(params = params,
+                        dtrain = train,
+                        num_boost_round = 1000,
+                        evals =[(valid,'validation')],
+                        early_stopping_rounds = 50)
+
+        y_pred = booster.predict(valid)
+        rmse = mean_squared_error(y_val, y_pred, squared=False)
+        mlflow.log_metric('rmse', rmse)
+
+        with open('model/preprocessor.b', 'wb') as f_out:
+            pickle.dump(dv, f_out)
+        mlflow.log_artifact('model/preprocessor.b', artifact_path='preprocessor')
+
+        mlflow.xgboost.log_model(booster, artifact_path='model_mlflow')
 
 
+if __name__=="__main__":
 
+    X_train, y_train, X_val, y_val, dv = add_features(train_path, train_val)
 
-params = {
-    'learning_rate': 0.20472,
-    'max_depth': 17,
-    'min_child_weight': 1.240261172,
-    'objective':'reg:linear',
-    'reg_alpha':0.285678967,
-    'reg_lambda': 0.004264404814,
-    'seed':42
-}
-
-# mlflow.xgboost.autolog()
-# booster = xgb.train(params = params,
-#                 dtrain = train,
-#                 num_boost_round = 1000,
-#                 evals =[(valid,'validation')],
-#                 early_stopping_rounds = 50)
-# mlflow.xgboost.autolog(disable=True)
-# with mlflow.start_run():
-#     params = {
-#     'learning_rate': 0.20472,
-#     'max_depth': 17,
-#     'min_child_weight': 1.240261172,
-#     'objective':'reg:linear',
-#     'reg_alpha':0.285678967,
-#     'reg_lambda': 0.004264404814,
-#     'seed':42
-#     }
-#     mlflow.log_params(params)
-    
-#     booster = xgb.train(params = params,
-#                     dtrain = train,
-#                     num_boost_round = 1000,
-#                     evals =[(valid,'validation')],
-#                     early_stopping_rounds = 50)
-
-#     y_pred = booster.predict(valid)
-#     rmse = mean_squared_error(y_val, y_pred, squared=False)
-#     mlflow.log_metric('rmse', rmse)
-
-#     with open('model/preprocessor.b', 'wb') as f_out:
-#         pickle.dump(dv, f_out)
-#     mlflow.log_artifact('model/preprocessor.b', artifact_path='preprocessor')
-
-#     mlflow.xgboost.log_model(booster, artifact_path='model_mlflow')
-
+    train = xgb.DMatrix(X_train, label = y_train)
+    valid = xgb.DMatrix(X_val, label = y_val)
+    train_model_search(train, valid, y_val)
+    train_best_model(train, valid, y_val, dv)
 
 
 
