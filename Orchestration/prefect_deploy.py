@@ -140,13 +140,14 @@ def main(train_path, train_val):
     X_train = read_dataframe(train_path)
     X_val = read_dataframe(train_val)
 
-    X_train, y_train, X_val, y_val, dv = add_features(X_train, X_val).result()  # .result is when you use add_feature function as @task
+    X_train, y_train, X_val, y_val, dv = add_features(X_train, X_val)#.result()  # .result is when you use add_feature function as @task
 
     train = xgb.DMatrix(X_train, label = y_train)
     valid = xgb.DMatrix(X_val, label = y_val)
     train_model_search(train, valid, y_val)
     train_best_model(train, valid, y_val, dv)
 
+main(train_path, train_val)
 # from prefect.deployments import DeploymentSpec
 # from prefect.orion.schemas.schedules import IntervalSchedule
 # from prefect.flow_runners import SubprocessFlowRunner
@@ -160,18 +161,22 @@ def main(train_path, train_val):
 #     tags=['ml']
 # )
 
-from prefect.deployments import Deployment
-from prefect.orion.schemas.schedules import IntervalSchedule
-from datetime import timedelta
+# from prefect.deployments import Deployment
+# from prefect.orion.schemas.schedules import IntervalSchedule
+# from datetime import timedelta
+# from prefect.filesystems import gcsfs
 
-deployment = Deployment.build_from_flow(
-    flow=main,
-    name="model_training",
-    schedule=IntervalSchedule(interval=timedelta(minutes=5)),
-    work_queue_name="ml"
-)
+# storage = gcsfs.load("mlflow-bucket-jay")
+# deployment = Deployment.build_from_flow(
+#     flow=main,
+#     name="model_training",
+#     schedule=IntervalSchedule(interval=timedelta(minutes=5)),
+#     storage = storage,
+#     work_queue_name="gcp",
+#     infra_overrides=["env.SOME_IMPORTANT_CONFIG=true"]
+# )
 
-deployment.apply()  
+# deployment.apply()  
 
     
 
