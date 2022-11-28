@@ -1,6 +1,12 @@
-Instructions for hosting Prefect Orion
+Instructions for hosting Prefect Orion on VM
 
-to set prefect for the server: prefect config set PREFECT_ORION_UI_API_URL="http://34.78.226.69:4200/api"
+to set prefect for the server: prefect config set PREFECT_ORION_UI_API_URL="http://34.78.84.50:4200/api"
+
+to check if IP is registered: prefect config view
+
+tp reset the prefect IP: prefect config unset PREFECT_ORION_UI_API_URL
+
+
 
 after setting the above commnad in the terminal, open browser terminal and type"(externalIP):4200"
 
