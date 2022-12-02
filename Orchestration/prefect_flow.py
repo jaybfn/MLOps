@@ -140,7 +140,7 @@ def main(train_path, train_val):
     X_train = read_dataframe(train_path)
     X_val = read_dataframe(train_val)
 
-    X_train, y_train, X_val, y_val, dv = add_features(X_train, X_val).result()  # .result is when you use add_feature function as @task
+    X_train, y_train, X_val, y_val, dv = add_features(X_train, X_val)#.result()  # .result is when you use add_feature function as @task
 
     train = xgb.DMatrix(X_train, label = y_train)
     valid = xgb.DMatrix(X_val, label = y_val)
