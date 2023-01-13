@@ -4,4 +4,5 @@ training_exp_tracking/models
 *.h5
 *.bin
 *.b
+key.json
 Secrets/
