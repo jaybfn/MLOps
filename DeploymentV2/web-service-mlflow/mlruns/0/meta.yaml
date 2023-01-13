@@ -1,0 +1,6 @@
+artifact_location: file:///home/swetha.bfn/projects/MLOps/DeploymentV2/web-service-mlflow/mlruns/0
+creation_time: 1673651771213
+experiment_id: '0'
+last_update_time: 1673651771213
+lifecycle_stage: active
+name: Default
