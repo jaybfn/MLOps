@@ -4,17 +4,13 @@ from flask import Flask, request, jsonify
 #from mlflow.tracking import MlflowClient
 from mlflow.artifacts import download_artifacts
 
-MLFLOW_TRACKING_URI = 'http://34.141.21.45:5000'  # postgres on SQL engine GCP
-RUN_ID = 'ab15b8c00fe445cfbfd88740811dcaad'
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-#client = MlflowClient(tracking_uri=MLFLOW_TRACKING_URI)
+#MLFLOW_TRACKING_URI = 'http://34.141.21.45:5000'  # postgres on SQL engine GCP
+RUN_ID = '8afa88e2ba804c409da9215ac724c283'
 
-#path = client.download_artifacts(run_id = RUN_ID, path='dict_vectorizer.bin')
-path = download_artifacts(run_id=RUN_ID, artifact_path='dict_vectorizer.bin')
-print('download the dict vectorizer to {path}')
-with open(path, 'rb') as f_out:
-    dv  = pickle.load(f_out)
-logged_model = f'runs:/{RUN_ID}/model'
+#mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+
+logged_model = f'gs://artifact-storage-mlflow/2/{RUN_ID}/artifacts/model'
+#logged_model = f'runs:/{RUN_ID}/model'
 
 
 model = mlflow.pyfunc.load_model(logged_model)
@@ -30,8 +26,7 @@ def prepare_features(ride):
 
 def predict(features):
 
-    X = dv.transform(features)
-    preds = model.predict(X)
+    preds = model.predict(features)
     return float(preds[0])
 
 
