@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+mlflow = "*"
+jupyter = "*"
+scikit-learn = "==1.2.0"
+pandas = "*"
+seaborn = "*"
+hyperopt = "*"
+xgboost = "*"
+fastparquet = "*"
+boto3 = "*"
+prefect = "==2.0b6"
+google-cloud-storage = "*"
+pyarrow = "*"
+psycopg2-binary = "*"
+sqlalchemy = "*"
+psutil = "==5.9.0"
+gcsfs = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
+python_full_version = "3.10.8"
