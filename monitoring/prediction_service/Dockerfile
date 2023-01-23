@@ -1,17 +1,16 @@
-FROM python:3.10-slim
 
-RUN pip install -U pip
-RUN pip install pipenv
-RUN pip install gunicorn
+FROM python:3.10-slim-buster
 
 WORKDIR /app
 
-COPY ["Pipfile","Pipfile.lock","./"]
+COPY requirements.txt requirements.txt
 
-RUN pipenv install --system --deploy
+RUN pip3 install -r requirements.txt
 
-COPY ["predict.py","lin_red.bin","./"]
+RUN pip3 install evidently
 
-EXPOSE 9696
+COPY app.py .
 
-ENTRYPOINT ["gunicorn", "--bind=0.0.0.0:9696","predict:app"]
+COPY lin_red.bin .
+
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=9696"]
